@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relay Prototypes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#DDE7EF;--card:#FFFDF8;--ink:#141414;--muted:#4A5560;--coral:#B4532C;--blue:#3E6A97}
+@media (prefers-color-scheme: dark){:root{--bg:#0F1B27;--card:#172636;--ink:#EEF2F6;--muted:#A8B5C2;--coral:#F2A47F;--blue:#9CC0E3;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Open Sans',Arial,sans-serif;padding:40px max(16px,env(safe-area-inset-left,0px))}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-family:'Bebas Neue',Arial,sans-serif;font-weight:400;font-size:64px;margin:0;line-height:1}
+h1 span{color:var(--coral)}
+p{margin:0;color:var(--muted)}
+a.card{display:flex;flex-direction:column;gap:4px;background:var(--card);border-radius:20px;padding:20px 24px;text-decoration:none;color:var(--ink);border:3px solid transparent}
+a.card:hover,a.card:focus-visible{border-color:var(--coral)}
+a.card b{font-family:'Bebas Neue',Arial,sans-serif;font-weight:400;font-size:34px;line-height:1}
+a.card span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Relay <span>Prototypes</span></h1>
+<p>Team #3 · A worry tracker for bedside nurses. Three prototypes, three hypotheses. In each one you're the same night nurse, and you type and save a worry about a patient.</p>
+<a class="card" href="simple.html"><b>1 · Relay Simple</b><span>One Worried button in the EHR. Type it, save it, other nurses see it.</span></a>
+<a class="card" href="team.html"><b>2 · Relay Team</b><span>Ask a teammate for a second look, and help with a teammate's worry.</span></a>
+<a class="card" href="together.html"><b>3 · Relay Together</b><span>The simple EHR button, plus the charge nurse and the next nurse at handoff.</span></a>
+</main>
+</body>
+</html>

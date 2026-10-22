@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Relay Team</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: one centered column. Intro, view switch, a hint bar that says what to tap, then the device or the EHR window. */
+:root{
+  --bg:#DDE7EF; --card:#FFFDF8; --ink:#141414; --muted:#4A5560; --line:#D3DCE4;
+  --coral:#E39A79; --coral-deep:#B4532C; --worry:#F6D3C3; --blue-deep:#3E6A97;
+  --navy:#102A43; --soft:#EEF3F8; --ok:#2F7A55; --ok-tint:#D7EEE1; --on-accent:#141414; --red:#B23A2A; --red-tint:#F6D6D0;
+  --ehr-bar:#33414F; --ehr-bg:#F4F6F8; --ehr-panel:#FFFFFF; --ehr-line:#CBD3DB; --ehr-text:#1F2933; --ehr-muted:#5B6773; --ehr-sel:#DCE8F5; --ehr-head:#E7ECF1;
+  --display:'Bebas Neue', 'Arial Narrow', Arial, sans-serif; --body:'Open Sans', Arial, sans-serif; --ehrfont:Arial, Helvetica, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1B27; --card:#172636; --ink:#EEF2F6; --muted:#A8B5C2; --line:#2A3D50;
+  --coral:#E9A585; --coral-deep:#F2A47F; --worry:#4A2E24; --blue-deep:#9CC0E3;
+  --navy:#08131E; --soft:#1E3144; --ok:#7FD0A4; --ok-tint:#1D3A2C; --red:#FF8F7E; --red-tint:#4A2420;
+  --ehr-bar:#1B2530; --ehr-bg:#151D26; --ehr-panel:#1C2631; --ehr-line:#33414F; --ehr-text:#E3E8ED; --ehr-muted:#9AA6B2; --ehr-sel:#26384B; --ehr-head:#222E3A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1B27; --card:#172636; --ink:#EEF2F6; --muted:#A8B5C2; --line:#2A3D50;
+  --coral:#E9A585; --coral-deep:#F2A47F; --worry:#4A2E24; --blue-deep:#9CC0E3;
+  --navy:#08131E; --soft:#1E3144; --ok:#7FD0A4; --ok-tint:#1D3A2C; --red:#FF8F7E; --red-tint:#4A2420;
+  --ehr-bar:#1B2530; --ehr-bg:#151D26; --ehr-panel:#1C2631; --ehr-line:#33414F; --ehr-text:#E3E8ED; --ehr-muted:#9AA6B2; --ehr-sel:#26384B; --ehr-head:#222E3A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--blue-deep);outline-offset:2px}
+.col{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+body.wide .col{max-width:1100px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--blue-deep);text-align:center}
+h1{font-family:var(--display);font-weight:400;font-size:52px;line-height:1;margin:0;text-align:center}
+h1 span{color:var(--coral-deep)}
+.you{text-align:center;margin:0 auto;color:var(--muted);max-width:56ch}
+.views{display:flex;align-self:center;background:var(--card);border-radius:999px;padding:4px;gap:2px}
+.views button{border:0;background:transparent;border-radius:999px;padding:8px 18px;font-weight:700;font-size:15px}
+.views button[aria-pressed="true"]{background:var(--navy);color:#FFFDF8}
+.hyp{text-align:center;margin:0 auto;max-width:56ch;font-weight:700;color:var(--ink);background:var(--card);border-radius:14px;padding:10px 16px}
+.hyp span{color:var(--coral-deep)}
+.hint{background:var(--navy);color:#FFFDF8;border-radius:16px;padding:12px 16px;display:flex;gap:12px;align-items:center;width:100%;max-width:560px;align-self:center}
+.hint b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--coral);line-height:1;flex:none}
+.hint p{margin:0;font-weight:600}
+.foot{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.link{background:none;border:0;color:var(--blue-deep);font-weight:700;padding:4px 0;text-decoration:underline}
+details{font-size:14px;color:var(--muted);max-width:460px}
+details summary{cursor:pointer;color:var(--blue-deep);font-weight:700}
+
+/* phone frame */
+.phone{background:var(--navy);border-radius:44px;padding:12px;box-shadow:0 24px 50px rgba(16,42,67,.25);width:100%;max-width:420px;align-self:center}
+.phone .relay{border-radius:34px;height:600px}
+
+/* the Relay app itself (same in both views) */
+.relay{background:var(--card);color:var(--ink);font-family:var(--body);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.rhead{padding:18px 20px 12px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);gap:10px}
+.brand{font-family:var(--display);font-size:32px;line-height:1}
+.brand small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:600;margin-left:8px}
+.rtime{font-family:var(--display);font-size:28px;color:var(--blue-deep);white-space:nowrap}
+.rbody{padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1}
+.label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.big{background:var(--coral);color:var(--on-accent);border:3px solid transparent;border-radius:999px;padding:13px 20px;font-family:var(--display);font-size:27px;letter-spacing:.04em}
+.big:disabled{opacity:.4;cursor:not-allowed;animation:none}
+.glow{border-color:var(--coral-deep)!important;animation:glow 1.3s ease-in-out infinite}
+.scrim{position:absolute;inset:0;background:rgba(16,42,67,.5);display:flex;align-items:flex-end;justify-content:center;z-index:5}
+.sheet{background:var(--card);width:min(520px,100%);border-radius:24px 24px 0 0;padding:20px;display:flex;flex-direction:column;gap:10px;max-height:100%;overflow-y:auto}
+.sheet h2{font-family:var(--display);font-weight:400;font-size:34px;margin:0;line-height:1}
+
+/* generic EHR window */
+.ehrwrap{overflow-x:auto;border-radius:12px;box-shadow:0 24px 50px rgba(16,42,67,.22)}
+.ehr{min-width:900px;background:var(--ehr-bg);color:var(--ehr-text);font-family:var(--ehrfont);font-size:13px;border:1px solid var(--ehr-line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.ehr-top{background:var(--ehr-bar);color:#E9EEF3;display:flex;align-items:center;gap:18px;padding:8px 14px}
+.ehr-logo{font-weight:700;font-size:14px;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.ehr-logo i{width:16px;height:16px;border-radius:4px;background:#8FA3B6;display:inline-block}
+.ehr-tabs{display:flex;gap:2px;flex:1}
+.ehr-tabs span{padding:5px 12px;border-radius:4px 4px 0 0;color:#C5D0DA}
+.ehr-tabs span.on{background:var(--ehr-bg);color:var(--ehr-text);font-weight:700}
+.ehr-user{color:#C5D0DA}
+.ehr-body{display:flex;min-height:560px}
+.ehr-nav{width:170px;background:var(--ehr-head);border-right:1px solid var(--ehr-line);padding:10px 0;display:flex;flex-direction:column;flex:none}
+.ehr-nav span{padding:7px 14px;color:var(--ehr-muted)}
+.ehr-nav span.on{background:var(--ehr-sel);color:var(--ehr-text);font-weight:700;border-left:4px solid var(--blue-deep);padding-left:10px}
+.ehr-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.ehr-sub{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--ehr-line);background:var(--ehr-panel);font-weight:700;gap:10px}
+.ehr-sub span{font-weight:400;color:var(--ehr-muted)}
+.ehr-table{width:100%;border-collapse:collapse;background:var(--ehr-panel)}
+.ehr-table th{background:var(--ehr-head);text-align:left;font-weight:700;padding:6px 10px;border-bottom:1px solid var(--ehr-line);white-space:nowrap}
+.ehr-table td{padding:8px 10px;border-bottom:1px solid var(--ehr-line);vertical-align:top}
+.ehr-table tr.sel td{background:var(--ehr-sel)}
+.ews{display:inline-block;padding:1px 8px;border-radius:3px;background:#DCEFE3;color:#1E5E3B;font-weight:700}
+.rflag{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--coral-deep)}
+.rflag i{width:10px;height:10px;border-radius:50%;background:var(--coral-deep);display:inline-block}
+.ehr-side{width:390px;border-left:1px solid var(--ehr-line);display:flex;flex-direction:column;flex:none}
+.ehr-sidehead{background:var(--ehr-head);padding:6px 12px;font-weight:700;border-bottom:1px solid var(--ehr-line);display:flex;justify-content:space-between}
+.ehr-sidehead span{font-weight:400;color:var(--ehr-muted)}
+.ehr-side .relay,.ehr-main .relay{flex:1}
+.ehr-cap{font-size:13px;color:var(--muted);text-align:center;margin:0}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(227,154,121,0)}50%{box-shadow:0 0 0 6px rgba(227,154,121,.55)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+@media (max-width:440px){ h1{font-size:44px} .phone .relay{height:560px} .brand small{display:none} }
+
+/* shared pieces for the v3 prototypes */
+.wtext{width:100%;border:3px solid var(--coral);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;background:var(--card);color:var(--ink);resize:vertical;min-height:70px}
+.wtext:focus{outline:3px solid var(--blue-deep);outline-offset:1px}
+.lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.lbl.red{color:var(--red)}
+.qs{display:flex;gap:6px;flex-wrap:wrap}
+.qs button{border:2px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.qs button:hover{border-color:var(--coral)}
+.plain{background:none;border:0;color:var(--blue-deep);font-weight:700;padding:6px}
+.check{display:flex;gap:12px;align-items:center;border:3px solid var(--line);background:var(--soft);border-radius:14px;padding:10px 14px;text-align:left;width:100%}
+.box{width:26px;height:26px;border-radius:8px;border:3px solid var(--blue-deep);flex:none;display:grid;place-items:center;font-weight:700;color:var(--card)}
+.check[aria-checked="true"] .box{background:var(--blue-deep)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:3px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-weight:600;font-size:14px}
+.pill[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:var(--on-accent)}
+.pt{width:100%;text-align:left;border:3px solid transparent;background:var(--soft);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;color:var(--ink)}
+.pt .nm{font-family:var(--display);font-size:26px;line-height:1}
+.pt .dx{font-size:13px;color:var(--muted)}
+.pt .w{font-size:15px;font-weight:600}
+.pt.worry{background:var(--worry)}
+.pt.due{background:var(--red-tint);border-color:var(--red)}
+.pt.team{background:var(--card);border-color:var(--blue-deep)}
+.chip{align-self:flex-start;margin-top:4px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--card);color:var(--ink)}
+.chip.red{background:var(--red);color:#fff}
+.chip.ok{background:var(--ok-tint);color:var(--ok)}
+.chip.navy{background:var(--navy);color:#FFFDF8}
+.reply{margin-top:6px;background:var(--card);border-radius:10px;padding:7px 10px;font-size:13px;border-left:4px solid var(--blue-deep)}
+.mate{border:3px dashed var(--blue-deep);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--card)}
+.mate.flash{border-style:solid;box-shadow:0 0 0 6px rgba(62,106,151,.25)}
+.matehead{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.matehead b{font-family:var(--display);font-weight:400;font-size:26px;line-height:1;color:var(--blue-deep)}
+.matehead span{font-size:13px;color:var(--muted)}
+.empty{font-size:14px;color:var(--muted);font-style:italic}
+
+body.wide .col{max-width:900px}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.sidelbl{text-align:center;font-weight:700;color:var(--muted);font-size:14px}
+.sidelbl b{font-family:var(--display);font-weight:400;font-size:26px;color:var(--ink);display:block;line-height:1}
+.sidelbl.other b{color:var(--blue-deep)}
+.phone{max-width:400px}
+.phone.matephone{background:var(--blue-deep)}
+.phone .relay{height:620px}
+.sheet .sub{margin:-4px 0 0;color:var(--muted);font-size:14px}
+@media (max-width:820px){ .duo{grid-template-columns:minmax(0,1fr)} }
+</style>
+</head>
+<body>
+
+
+<div class="col">
+  <div class="eyebrow">Relay · Prototype 2 of 3</div>
+  <h1>Relay <span>Team</span></h1>
+  <p class="hyp">We think: <span>nurses will flag more worries when a teammate can help, and helping each other is what makes Relay worth using.</span></p>
+  <p class="you">You are a night nurse on 5 West. Mr. Lee seems sleepier than usual, but his vitals look fine. Your phone is on the left.</p>
+  <div class="hint" aria-live="polite"><b id="stepn">1/2</b><p id="hint"></p></div>
+  <div class="duo">
+    <div class="side"><div class="sidelbl"><b>Your phone</b>Night nurse</div><div class="phone"><div class="relay" id="app"></div></div></div>
+    <div class="side"><div class="sidelbl other"><b>What other nurses see</b>Peng's phone, another nurse on 5 West</div><div class="phone matephone"><div class="relay" id="mate"></div></div></div>
+  </div>
+  <div class="foot">
+    <button class="link" id="reset" type="button">Start over</button>
+    <details><summary>What we're testing</summary>Sebastian and Elizabeth told us newer nurses hesitate to escalate “just a feeling,” and research on nurse concern shows sharing it with the team helps patients. If a worry can quietly reach a teammate who answers “I'll come look,” will nurses flag more, and help each other more?</details>
+  </div>
+</div>
+
+<script>
+(function(){
+document.body.classList.add("wide");
+const PTS=[{id:"lee",rm:"12",name:"Mr. Lee",dx:"Hip surgery yesterday"},{id:"diaz",rm:"14",name:"Ms. Diaz",dx:"Pneumonia"},{id:"chen",rm:"15",name:"Mr. Chen",dx:"Urine infection"}];
+const QS=["Sleepier than usual","More confused","Just doesn't look right"];
+const fresh=()=>({mine:null,pid:null,ask:false,reply:false,helped:false});
+let S=fresh(), timer=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const app=$("#app"), mate=$("#mate");
+function step(){ if(!S.mine) return 1; if(!S.helped) return 2; return 3; }
+function hint(){
+  const H={1:["Tap Mr. Lee. Type your worry, tick “Ask a teammate for a second look,” and Save.","1/2"],
+    2:[S.ask?"Your worry is on Peng's phone (right), and he's coming. Now help a teammate: tap Li Wen's worry.":"Your worry is on Peng's phone (right). Now help a teammate: tap Li Wen's worry.","2/2"],
+    3:["Done. You asked for help, got it, and helped someone else. That's Relay Team.","✓"]}[step()];
+  $("#hint").textContent=H[0]; $("#stepn").textContent=H[1];
+}
+const head=(who)=>`<div class="rhead"><div class="brand">Relay<small>${who}</small></div><div class="rtime">8:06 PM</div></div>`;
+const liwen=(mine)=>`<button class="pt team ${mine&&step()===2?"glow":""}" ${mine?'id="lw"':""} type="button"><span class="nm">Rm 7 · Ms. Park</span><span class="w">“Family says she isn't herself tonight.”</span><span class="dx">Li Wen's patient · 7:55 PM</span>
+  ${S.helped?`<span class="chip ok">${mine?"You're":"Night nurse is"} going to help</span>`:`<span class="chip navy">Li Wen asked for a second look</span>`}</button>`;
+
+function render(){
+  hint();
+  const p=S.pid&&PTS.find(x=>x.id===S.pid);
+  let h=head("You · 5 West")+`<div class="rbody"><div class="lbl">Teammates asking for help</div>${liwen(true)}`;
+  if(S.mine){ h+=`<div class="lbl">My worries</div><div class="pt worry"><span class="nm">Rm ${p.rm} · ${p.name}</span><span class="w">Worried: ${esc(S.mine)}</span>
+    ${S.ask?(S.reply?`<span class="reply"><b>Peng:</b> Saw it. I'll come look at ${p.name} with you.</span>`:`<span class="chip navy">Asked a teammate for a second look</span>`):`<span class="chip">Shared with 5 West</span>`}</div>`; }
+  h+=`<div class="lbl">My patients</div>`+PTS.filter(x=>!(S.mine&&x.id===S.pid)).map(x=>`<button class="pt ${step()===1&&x.id==="lee"?"glow":""}" data-p="${x.id}" type="button"><span class="nm">Rm ${x.rm} · ${x.name}</span><span class="dx">${x.dx}</span></button>`).join("")+`</div>`;
+  app.innerHTML=h;
+  let m=head("Peng · 5 West")+`<div class="rbody"><div class="lbl">Team worries on 5 West</div>`;
+  if(S.mine){ m+=`<div class="pt worry"><span class="nm">Rm ${p.rm} · ${p.name}</span><span class="w">“${esc(S.mine)}”</span><span class="dx">From the night nurse · 8:06 PM</span>
+    ${S.ask?(S.reply?`<span class="chip ok">You said: I'll come look</span>`:`<span class="chip navy">Asked you for a second look</span>`):""}</div>`; }
+  m+=liwen(false);
+  if(!S.mine) m+=`<p class="empty">When the night nurse saves a worry, it shows up here.</p>`;
+  m+=`</div>`;
+  mate.innerHTML=m;
+  app.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>{ if(!S.mine) flag(b.dataset.p); }));
+  const lw=$("#lw"); if(lw) lw.addEventListener("click",help);
+}
+function sheet(html){ const sc=document.createElement("div"); sc.className="scrim"; sc.innerHTML=`<div class="sheet" role="dialog">${html}</div>`; app.appendChild(sc); return sc; }
+function flag(id){
+  const p=PTS.find(x=>x.id===id); let ask=false;
+  const sc=sheet(`<h2>Worried about ${p.name}?</h2>
+    <textarea class="wtext" id="wtext" rows="2" aria-label="Type the worry in your own words" placeholder="Type it in your own words, e.g. Hard to wake at 8 pm"></textarea>
+    <div class="lbl">Or start with</div><div class="qs">${QS.map(q=>`<button type="button">${q}</button>`).join("")}</div>
+    <button class="check" id="ask" type="button" role="checkbox" aria-checked="false"><span class="box">✓</span><span>Ask a teammate for a second look</span></button>
+    <button class="big" id="go" type="button" disabled>Save worry</button><button class="plain" id="x" type="button">Cancel</button>`);
+  const ta=sc.querySelector("#wtext"), go=sc.querySelector("#go"), a=sc.querySelector("#ask");
+  const sync=()=>{ const ok=!!ta.value.trim(); go.disabled=!ok; go.classList.toggle("glow",ok); a.classList.toggle("glow",ok&&!ask); };
+  ta.addEventListener("input",sync); ta.focus();
+  sc.querySelectorAll(".qs button").forEach(b=>b.addEventListener("click",()=>{ ta.value=b.textContent+", "; ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); sync(); }));
+  a.addEventListener("click",()=>{ ask=!ask; a.setAttribute("aria-checked",String(ask)); sync(); });
+  sc.querySelector("#x").addEventListener("click",()=>sc.remove());
+  go.addEventListener("click",()=>{ S.mine=ta.value.trim(); S.pid=id; S.ask=ask; sc.remove(); render();
+    if(ask){ clearTimeout(timer); timer=setTimeout(()=>{ if(S.mine){ S.reply=true; render(); } },1500); } });
+}
+function help(){
+  if(S.helped) return;
+  const sc=sheet(`<h2>Help Li Wen with Ms. Park?</h2><p class="sub">Rm 7 · “Family says she isn't herself tonight.”</p>
+    <button class="big glow" id="come" type="button">I'll come look</button><button class="plain" id="x" type="button">Not now</button>`);
+  sc.querySelector("#x").addEventListener("click",()=>sc.remove());
+  sc.querySelector("#come").addEventListener("click",()=>{ S.helped=true; sc.remove(); render(); });
+}
+$("#reset").addEventListener("click",()=>{ clearTimeout(timer); S=fresh(); render(); });
+render();
+})();
+</script>
+
+</body>
+</html>
